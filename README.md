@@ -1,7 +1,7 @@
 # FreeBSD で Mastodon を動かすためのいろいろ
 
-rc.d script を /usr/local/etc/rc.d に配置して
-/etc/rc.conf に記述すると他のサービスと同じように扱えるようになる（はず
+rc.d script を /usr/local/etc/rc.d に配置して<br>
+/etc/rc.conf に以下のように記述すると他のサービスと同じように扱えるようになる（はず
 ~~~shell
 mastodon_owner="mastodon"
 mastodon_base="/opt/mastodon"
