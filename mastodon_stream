@@ -60,17 +60,18 @@ mastodon_stream_start()
 
 mastodon_stream_stop()
 {
-        if [ "x" == "x${mastodon_stream_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_stream_pid}`" ]; then
                 echo "${name} not running?"
         else
-                kill -9 ${mastodon_stream_pid}
+                kill -KILL `cat ${mastodon_stream_pid}`
+                rm ${mastodon_stream_pid}
                 echo "${name} stoped"
         fi
 }
 
 mastodon_stream_status()
 {
-        if [ "x" == "x${mastodon_stream_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_stream_pid}`" ]; then
                 echo "${name} is not running."
         else
                 echo "${name} is running as pid `cat ${mastodon_stream_pid}`."
