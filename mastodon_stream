@@ -41,7 +41,7 @@ mastodon_user=${mastodon_user:-"mastodon"}
 
 mastodon_stream_enable=${mastodon_stream_enable:-"NO"}
 mastodon_stream_base=${mastodon_base:-"/opt/mastodon"}
-mastodon_stream_pid="/var/run/mastodon/nodejs.pid"
+mastodon_stream_pid=`ps ax | grep '[\(]node' | grep npm | cut -f 1 -w > ${mastodon_stream_pid}`
 mastodon_stream_cmd="nohup npm run start 1>>${log_file} 2>>${err_log_file}"
 node_env="NODE_ENV=production  STREAMING_CLUSTER_NUM=1"
 
@@ -54,27 +54,25 @@ mastodon_stream_start()
 {
         su -l ${mastodon_user} -c "touch ${log_file} ${err_log_file}"
         su -l ${mastodon_user} -c "cd ${mastodon_stream_base} &&  ${node_env} ${mastodon_stream_cmd} &"
-        ps ax | grep '[\(]node' | grep npm | cut -f 1 -w > ${mastodon_stream_pid}
         echo "${name} started"
 }
 
 mastodon_stream_stop()
 {
-        if [ "x" == "x`cat ${mastodon_stream_pid}`" ]; then
+        if [ "x" == "x${mastodon_stream_pid}" ]; then
                 echo "${name} not running?"
         else
-                kill -KILL `cat ${mastodon_stream_pid}`
-                rm ${mastodon_stream_pid}
+                kill -KILL ${mastodon_stream_pid}
                 echo "${name} stoped"
         fi
 }
 
 mastodon_stream_status()
 {
-        if [ "x" == "x`cat ${mastodon_stream_pid}`" ]; then
+        if [ "x" == "x${mastodon_stream_pid}" ]; then
                 echo "${name} is not running."
         else
-                echo "${name} is running as pid `cat ${mastodon_stream_pid}`."
+                echo "${name} is running as pid ${mastodon_stream_pid}."
         fi
 }
 
