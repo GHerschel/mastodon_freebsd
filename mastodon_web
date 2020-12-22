@@ -65,7 +65,7 @@ mastodon_web_start()
 
 mastodon_web_stop()
 {
-        if [ "x" == "x${mastodon_web_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_web_pid}`" ]; then
                 echo "${name} not running?"
         else
                 kill -9 ${mastodon_web_pid}
@@ -76,7 +76,7 @@ mastodon_web_stop()
 
 mastodon_web_status()
 {
-        if [ "x" == "x${mastodon_web_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_web_pid}`" ]; then
                 echo "${name} is not running. pid: `cat ${mastodon_web_pid}`"
         else
                 echo "${name} is running as pid `cat ${mastodon_web_pid}`."
