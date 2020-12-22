@@ -59,20 +59,21 @@ mastodon_worker_start()
 
 mastodon_worker_stop()
 {
-        if [ "x" == "x${mastodon_worker_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_worker_pid}`" ]; then
                 echo "${name} not running?"
         else
-                kill ${mastodon_worker_pid}
+                kill -KILL `cat ${mastodon_worker_pid}`
+                rm ${mastodon_worker_pid}
                 echo "${name} stoped"
         fi
 }
 
 mastodon_worker_status()
 {
-        if [ "x" == "x${mastodon_worker_pid}" ]; then
+        if [ "x" == "x`cat ${mastodon_worker_pid}`" ]; then
                 echo "${name} is not running."
         else
-                echo "${name} is running as pid ${mastodon_worker_pid}."
+                echo "${name} is running as pid `cat ${mastodon_worker_pid}`."
         fi
 }
 
