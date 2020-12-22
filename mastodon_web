@@ -35,10 +35,9 @@ start_cmd=${name}_start
 stop_cmd=${name}_stop
 status_cmd=${name}_status
 
-_date=`date '+%Y%m%d'`
 _log_prefix="/var/log/mastodon"
-log_file="${_log_prefix}/${name}_${_date}.log"
-err_log_file="${_log_prefix}/${name}_error_${_date}.log"
+log_file="${_log_prefix}/${name}.log"
+err_log_file="${_log_prefix}/${name}_error.log"
 
 mastodon_bundle_cmd=${mastodon_bundle_cmd:-"/usr/local/bin/bundle"}
 mastodon_user=${mastodon_user:-"mastodon"}
@@ -46,19 +45,15 @@ rails_env=production
 
 mastodon_web_enable=${mastodon_web_enable:-"NO"}
 mastodon_web_base=${mastodon_base:-"/opt/mastodon"}
+mastodon_web_pid="/var/run/mastodon/puma.pid"
 mastodon_web_cmd="${mastodon_bundle_cmd} exec puma \
         --environment ${rails_env} \
         --quiet \
         --config config/puma.rb \
-        --pidfile /var/run/mastodon/${name}.pid \
+        --pidfile ${mastodon_web_pid} \
         --redirect-stdout ${log_file} \
         --redirect-stderr ${err_log_file} \
         --daemon "
-
-if [ -r /var/run/mastodon/puma.pid ]; then
-        mastodon_web_pid=`cat /var/run/mastodon/puma.pid`
-fi
-
 
 mastodon_web_start()
 {
@@ -74,7 +69,7 @@ mastodon_web_stop()
                 echo "${name} not running?"
         else
                 kill -9 ${mastodon_web_pid}
-                rm /var/run/mastodon/puma.pid
+                rm ${mastodon_web_pid}
                 echo "${name} stoped"
         fi
 }
@@ -82,9 +77,9 @@ mastodon_web_stop()
 mastodon_web_status()
 {
         if [ "x" == "x${mastodon_web_pid}" ]; then
-                echo "${name} is not running. pid: ${mastodon_web_pid}"
+                echo "${name} is not running. pid: `cat ${mastodon_web_pid}`"
         else
-                echo "${name} is running as pid ${mastodon_web_pid}."
+                echo "${name} is running as pid `cat ${mastodon_web_pid}`."
         fi
 }
 
