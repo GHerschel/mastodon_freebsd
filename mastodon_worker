@@ -35,10 +35,9 @@ start_cmd=${name}_start
 stop_cmd=${name}_stop
 status_cmd=${name}_status
 
-_date=`date '+%Y%m%d'`
 _log_prefix="/var/log/mastodon"
-log_file="${_log_prefix}/${name}_${_date}.log"
-err_log_file="${_log_prefix}/${name}_error_${_date}.log"
+log_file="${_log_prefix}/${name}.log"
+err_log_file="${_log_prefix}/${name}_error.log"
 
 mastodon_bundle_cmd=${mastodon_bundle_cmd:-"/usr/local/bin/bundle"}
 mastodon_user=${mastodon_user:-"mastodon"}
