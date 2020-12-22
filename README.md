@@ -1,7 +1,7 @@
 # FreeBSD で Mastodon を動かすためのいろいろ
 
 mkdir /var/run/mastodon ; chown mastodon /var/run/mastodon としておいて、<br>
-rc.d script を /usr/local/etc/rc.d に配置して<br>
+rc スクリプトを /usr/local/etc/rc.d に配置して<br>
 /etc/rc.conf に以下のように記述すると他のサービスと同じように扱えるようになる（はず
 
 ~~~shell
