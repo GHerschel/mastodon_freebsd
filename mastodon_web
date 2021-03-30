@@ -52,13 +52,12 @@ mastodon_web_cmd="${mastodon_bundle_cmd} exec puma \
         --config config/puma.rb \
         --pidfile ${mastodon_web_pid} \
         --redirect-stdout ${log_file} \
-        --redirect-stderr ${err_log_file} \
-        --daemon "
+        --redirect-stderr ${err_log_file} "
 
 mastodon_web_start()
 {
         su -l ${mastodon_user} -c "touch ${log_file} ${err_log_file}"
-        su -l ${mastodon_user} -c "cd ${mastodon_web_base} &&  ${mastodon_web_cmd}"
+        su -l ${mastodon_user} -c "cd ${mastodon_web_base} &&  ${mastodon_web_cmd} &"
 
         echo "${name} started"
 }
