@@ -29,51 +29,27 @@ name="mastodon_worker"
 rcvar=${name}_enable
 
 load_rc_config $name
+: ${mastodon_bundle_cmd:="/usr/local/bin/bundle"}
+: ${mastodon_user:="mastodon"}
+: ${mastodon_base:="/opt/mastodon"}
 
-extra_commands="status"
-start_cmd=${name}_start
-stop_cmd=${name}_stop
-status_cmd=${name}_status
+piddir="/var/run/mastodon"
+pidfile="${piddir}/${name}.pid"
 
-_log_prefix="/var/log/mastodon"
-log_file="${_log_prefix}/${name}.log"
-err_log_file="${_log_prefix}/${name}_error.log"
+logdir="/var/log/mastodon"
+logfile="${logdir}/${name}.log"
+err_logfile="${logdir}/${name}_error.log"
 
-mastodon_bundle_cmd=${mastodon_bundle_cmd:-"/usr/local/bin/bundle"}
-mastodon_user=${mastodon_user:-"mastodon"}
-rails_env=production
+procname="ruby"
 
-mastodon_worker_enable=${mastodon_worker_enable:-"NO"}
-mastodon_worker_base=${mastodon_base:-"/opt/mastodon"}
-mastodon_worker_pid=`ps ax | grep sidekiq | grep mastodon | awk '{printf $1" "}'`
+export RAILS_ENV=production
+export RAILS_LOG_LEVEL=warn
+export DB_POOL=25
+export MALLOC_ARENA_MAX=2
 
-mastodon_worker_cmd="${mastodon_bundle_cmd} exec sidekiq -e ${rails_env} 1>>${log_file} 2>>${err_log_file}"
+daemon_cmd="/usr/sbin/daemon -u ${mastodon_user} -p ${pidfile} -m 2 -o ${err_logfile} "
+start_cmd="${daemon_cmd} ${mastodon_bundle_cmd} exec sidekiq  > ${logfile}"
 
-
-mastodon_worker_start()
-{
-        su -l ${mastodon_user} -c "touch ${log_file} ${err_log_file}"
-        su -l ${mastodon_user} -c "cd ${mastodon_worker_base} && ${mastodon_worker_cmd} &"
-        echo "${name} started"
-}
-
-mastodon_worker_stop()
-{
-        if [ "x" == "x${mastodon_worker_pid}" ]; then
-                echo "${name} not running?"
-        else
-                kill -KILL ${mastodon_worker_pid}
-                echo "${name} stoped"
-        fi
-}
-
-mastodon_worker_status()
-{
-        if [ "x" == "x${mastodon_worker_pid}" ]; then
-                echo "${name} is not running."
-        else
-                echo "${name} is running as pid ${mastodon_worker_pid}."
-        fi
-}
+cd $mastodon_base
 
 run_rc_command "$1"
