@@ -26,54 +26,27 @@ name="mastodon_stream"
 rcvar=${name}_enable
 
 load_rc_config $name
+: ${mastodon_bundle_cmd:="/usr/local/bin/bundle"}
+: ${mastodon_user:="mastodon"}
+: ${mastodon_base:="/ope/mastodon"}
 
-extra_commands="status"
-start_cmd=${name}_start
-stop_cmd=${name}_stop
-status_cmd=${name}_status
+piddir="/var/run/mastodon"
+pidfile="${piddir}/${name}.pid"
 
-_log_prefix="/var/log/mastodon"
-log_file="${_log_prefix}/${name}.log"
-err_log_file="${_log_prefix}/${name}_error.log"
+logdir="/var/log/mastodon"
+logfile="${logdir}/${name}.log"
+err_logfile="${logdir}/${name}_error.log"
 
-
-mastodon_user=${mastodon_user:-"mastodon"}
-
-mastodon_stream_enable=${mastodon_stream_enable:-"NO"}
-mastodon_stream_base=${mastodon_base:-"/opt/mastodon"}
-mastodon_stream_pid=`ps ax | grep '[\(]node' | grep npm | cut -f 1 -w`
-mastodon_stream_cmd="nohup npm run start 1>>${log_file} 2>>${err_log_file}"
-node_env="NODE_ENV=production  STREAMING_CLUSTER_NUM=1"
+procname="node"
 
 PATH=${PATH}:/usr/local/bin
-export RAILS_ENV=production
 export NODE_ENV=production
 export STREAMING_CLUSTER_NUM=1
 
-mastodon_stream_start()
-{
-        su -l ${mastodon_user} -c "touch ${log_file} ${err_log_file}"
-        su -l ${mastodon_user} -c "cd ${mastodon_stream_base} &&  ${node_env} ${mastodon_stream_cmd} &"
-        echo "${name} started"
-}
+daemon_cmd="/usr/sbin/daemon -u ${mastodon_user} -p ${pidfile} -m 2 -o ${err_logfile}"
+start_cmd="${daemon_cmd} node ./streaming/index.js"
 
-mastodon_stream_stop()
-{
-        if [ "x" == "x${mastodon_stream_pid}" ]; then
-                echo "${name} not running?"
-        else
-                kill -KILL ${mastodon_stream_pid}
-                echo "${name} stoped"
-        fi
-}
+cd ${mastodon_base}
 
-mastodon_stream_status()
-{
-        if [ "x" == "x${mastodon_stream_pid}" ]; then
-                echo "${name} is not running."
-        else
-                echo "${name} is running as pid ${mastodon_stream_pid}."
-        fi
-}
 
 run_rc_command "$1"
